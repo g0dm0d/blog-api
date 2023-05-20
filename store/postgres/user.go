@@ -22,9 +22,20 @@ func (s *UserStore) CreateUser(opts store.CreateUserOpts) (store.User, error) {
 	return store.User{}, err
 }
 
-func (s *UserStore) GetUser(opts store.GetUserOpts) (store.User, error) {
+// GetUserByLogin Login is email or username
+func (s *UserStore) GetUserByLogin(opts store.GetUserOpts) (store.User, error) {
 	var user store.User
 	req := s.db.QueryRow("SELECT * FROM get_user_by_email_or_username($1)", opts.Login)
+	err := req.Scan(&user.Id, &user.Username, &user.Email, &user.Password, &user.Role, &user.CreatedAt)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
+
+func (s *UserStore) GetUserByID(userID int) (store.User, error) {
+	var user store.User
+	req := s.db.QueryRow("SELECT * FROM get_user_by_id($1)", userID)
 	err := req.Scan(&user.Id, &user.Username, &user.Email, &user.Password, &user.Role, &user.CreatedAt)
 	if err != nil {
 		return user, err

@@ -25,5 +25,6 @@ type GetUserOpts struct {
 
 type UserStore interface {
 	CreateUser(opts CreateUserOpts) (User, error)
-	GetUser(opts GetUserOpts) (User, error)
+	GetUserByLogin(opts GetUserOpts) (User, error)
+	GetUserByID(userID int) (User, error)
 }

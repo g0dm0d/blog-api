@@ -1,8 +1,10 @@
 package rest
 
 import (
+	"blog-api/rest/middleware"
 	"blog-api/rest/req"
 	"blog-api/service"
+	"blog-api/tools/tokenmanager"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -13,14 +15,16 @@ type Server struct {
 	server *http.Server
 	router chi.Router
 
-	Service *service.Service
+	tokenManager *tokenmanager.Tool
+	service      *service.Service
 }
 
 type Config struct {
 	Addr string
 	Port string
 
-	Service *service.Service
+	TokenManager *tokenmanager.Tool
+	Service      *service.Service
 }
 
 func NewServer(config *Config) *Server {
@@ -31,7 +35,8 @@ func NewServer(config *Config) *Server {
 		},
 		router: chi.NewRouter(),
 
-		Service: config.Service,
+		tokenManager: config.TokenManager,
+		service:      config.Service,
 	}
 }
 
@@ -42,9 +47,18 @@ func (s *Server) RunServer() error {
 func (s *Server) SetupRouter() {
 	s.setupCors()
 
-	s.router.Route("/api", func(r chi.Router) {
-		r.Method("POST", "/signup", req.NewHandler(s.Service.User.Signup))
-		r.Method("POST", "/signin", req.NewHandler(s.Service.User.Signin))
+	// middleware
+	mw := middleware.New(s.service, s.tokenManager)
+
+	s.router.Route("/auth", func(r chi.Router) {
+		r.Method("POST", "/signup", req.NewHandler(s.service.User.Signup))
+		r.Method("POST", "/signin", req.NewHandler(s.service.User.Signin))
+		r.Method("POST", "/refresh", req.NewHandler(s.service.User.Refresh))
+	})
+
+	s.router.Route("/", func(r chi.Router) {
+		r.Use(mw.Auth)
+		r.Method("GET", "/me", req.NewHandler(s.service.User.Me))
 	})
 	s.server.Handler = s.router
 }

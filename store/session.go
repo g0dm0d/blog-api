@@ -15,7 +15,13 @@ type CreateSessionOpts struct {
 	RefreshToken string
 }
 
+type UpdateSessionOpts struct {
+	NewToken string
+	OldToken string
+}
+
 type SessionStore interface {
 	CreateSession(opts CreateSessionOpts) error
+	UpdateSession(opts UpdateSessionOpts) (int, error)
 	ClearExpSession() error
 }

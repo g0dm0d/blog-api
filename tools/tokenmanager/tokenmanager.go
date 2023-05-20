@@ -12,6 +12,7 @@ import (
 type TokenManager interface {
 	GenerateAccessToken(user model.User) (string, error)
 	GenerateRefreshToken() (string, error)
+	ValidateJWTToken(token string) (*Claims, error)
 }
 
 type Tool struct {
@@ -26,7 +27,7 @@ func New(secret string) *Tool {
 
 const (
 	AccessLiveTime     = 24 * time.Hour
-	RefreshTokenLenght = 16
+	RefreshTokenLength = 16
 )
 
 type Claims struct {
@@ -57,11 +58,28 @@ func (t *Tool) GenerateAccessToken(user model.User) (string, error) {
 }
 
 func (t *Tool) GenerateRefreshToken() (string, error) {
-	refreshToken, err := generateRandomSalt(RefreshTokenLenght)
+	refreshToken, err := generateRandomSalt(RefreshTokenLength)
 	if err != nil {
 		return "", err
 	}
 	return refreshToken, nil
+}
+
+func (t *Tool) ValidateJWTToken(token string) (*Claims, error) {
+	claims := &Claims{}
+
+	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(t.secret), nil
+	})
+	if err != nil {
+		return &Claims{}, err
+	}
+
+	if !tkn.Valid {
+		return &Claims{}, nil
+	}
+
+	return claims, nil
 }
 
 func generateRandomSalt(length int) (string, error) {

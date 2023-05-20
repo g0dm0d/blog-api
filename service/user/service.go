@@ -9,6 +9,8 @@ import (
 type User interface {
 	Signup(ctx *req.Ctx) error
 	Signin(ctx *req.Ctx) error
+	Me(ctx *req.Ctx) error
+	Refresh(ctx *req.Ctx) error
 }
 
 type Service struct {
@@ -19,8 +21,8 @@ type Service struct {
 
 func New(userStore store.UserStore, sessionStore store.SessionStore, token tokenmanager.Tool) *Service {
 	return &Service{
-		userStore:    userStore,
-		sessionStore: sessionStore,
-		tokenManager: token,
+		userStore,
+		sessionStore,
+		token,
 	}
 }

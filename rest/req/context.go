@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 type Ctx struct {
@@ -23,4 +24,11 @@ func (c *Ctx) JSON(v interface{}) error {
 	c.Writer.Header().Set("Content-Type", "application/json")
 
 	return json.NewEncoder(c.Writer).Encode(v)
+}
+
+func (c *Ctx) BearerToken() string {
+	authorization := c.Request.Header.Get("authorization")
+
+	authorizationSplitted := strings.Split(authorization, " ")
+	return authorizationSplitted[1]
 }

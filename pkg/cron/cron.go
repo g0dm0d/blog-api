@@ -11,11 +11,30 @@ type Task struct {
 	Action   func() error
 }
 
+// These are the parameters of the time when the task starts.
+//
+// The IsDate parameter is a parameter which means that the task is executed relative to 00:00 real time. e.g.
+//
+//	cron.AddTask(cron.Task{
+//			Name: "Task",
+//			Schedule: cron.Schedule{
+//				IsDate: true,
+//				Day: 0,
+//				Hours: 12,
+//				Minutes: 0,
+//				Seconds: 0,
+//			},
+//			Action: someFunc,
+//		})
+//
+// IsDate = true this task will run every day at 12:00:00
+//
+// IsDate = false, then it will run every 12 hours
 type Schedule struct {
 	IsDate  bool
 	Day     int
 	Hours   int
-	Minuts  int
+	Minutes int
 	Seconds int
 }
 
@@ -60,14 +79,14 @@ func (c *Cron) runTask(task *Task) {
 }
 
 func (s *Schedule) calcTime() time.Duration {
-	return (time.Hour*24*time.Duration(s.Day) + time.Hour*time.Duration(s.Hours) + time.Minute*time.Duration(s.Minuts) + time.Second*time.Duration(s.Seconds))
+	return time.Hour*24*time.Duration(s.Day) + time.Hour*time.Duration(s.Hours) + time.Minute*time.Duration(s.Minutes) + time.Second*time.Duration(s.Seconds)
 }
 
 func (s *Schedule) getTime() time.Time {
 	if s.IsDate {
 		year, month, day := time.Now().AddDate(0, 0, 1+s.Day).Date()
 		loc := time.Now().Location()
-		date := time.Date(year, month, day, s.Hours, s.Minuts, s.Seconds, 0, loc)
+		date := time.Date(year, month, day, s.Hours, s.Minutes, s.Seconds, 0, loc)
 		return date
 	}
 	return time.Now().Add(s.calcTime())

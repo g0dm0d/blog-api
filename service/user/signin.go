@@ -27,7 +27,7 @@ func (s *Service) Signin(ctx *req.Ctx) error {
 		return fmt.Errorf("error parsing sign up request -> %w", err)
 	}
 
-	user, err := s.userStore.GetUser(store.GetUserOpts{
+	user, err := s.userStore.GetUserByLogin(store.GetUserOpts{
 		Login: r.Login,
 	})
 	if err != nil {

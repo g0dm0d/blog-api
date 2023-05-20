@@ -38,7 +38,7 @@ func main() {
 			IsDate:  true,
 			Day:     0,
 			Hours:   0,
-			Minuts:  1,
+			Minutes: 1,
 			Seconds: 0,
 		},
 		Action: sessionStore.ClearExpSession,
@@ -50,13 +50,14 @@ func main() {
 	tokenManager := tokenmanager.New(cfg.Server.Secret)
 
 	// Services
-	service := service.New(userStore, sessionStore, *tokenManager)
+	services := service.New(userStore, sessionStore, *tokenManager)
 
 	// generate params for http server
 	server := rest.NewServer(&rest.Config{
-		Addr:    cfg.Server.Addr,
-		Port:    cfg.Server.Port,
-		Service: service,
+		Addr:         cfg.Server.Addr,
+		Port:         cfg.Server.Port,
+		Service:      services,
+		TokenManager: tokenManager,
 	})
 	// setup routs
 	server.SetupRouter()

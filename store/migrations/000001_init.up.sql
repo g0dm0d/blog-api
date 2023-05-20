@@ -27,7 +27,7 @@ BEGIN
 END;
 $$;
 
--- Create get user func
+-- Create get user by email or username func
 CREATE OR REPLACE FUNCTION get_user_by_email_or_username(
     IN email_or_username VARCHAR
 )
@@ -44,6 +44,26 @@ BEGIN
     SELECT id, username, email, password, role, created_at
     FROM users
     WHERE email = email_or_username OR username = email_or_username;
+END;
+$$;
+
+-- Create get user by id func
+CREATE OR REPLACE FUNCTION get_user_by_id(
+    IN search_id INT
+)
+RETURNS TABLE (
+    p_id        INT,
+    p_username  VARCHAR,
+    p_email     VARCHAR,
+    p_password  VARCHAR,
+    p_role      SMALLINT,
+    p_created_at TIMESTAMP
+) LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT id, username, email, password, role, created_at
+    FROM users
+    WHERE id = search_id;
 END;
 $$;
 
@@ -69,18 +89,26 @@ BEGIN
 END;
 $$;
 
--- Create update session procedure
-CREATE OR REPLACE PROCEDURE update_session(
-    p_user_id       INT,
-    p_refresh_token VARCHAR(40)
-) LANGUAGE plpgsql AS $$
+-- Update refresh token procedure
+CREATE OR REPLACE FUNCTION update_session(
+    p_new_token VARCHAR(40),
+    p_old_token VARCHAR(40)
+) RETURNS INT AS $$
+DECLARE
+    p_user_id INT;
 BEGIN
-    UPDATE sessions
-    SET refresh_token = p_refresh_token,
-        expires_at = (current_date + interval '7 days')
-    WHERE user_id = p_user_id;
+    IF EXISTS (SELECT 1 FROM sessions WHERE refresh_token = p_old_token) THEN
+        UPDATE sessions
+        SET refresh_token = p_new_token,
+            expires_at = (current_date + interval '7 days')
+        WHERE refresh_token = p_old_token
+        RETURNING user_id INTO p_user_id;
+        RETURN p_user_id;
+    ELSE
+        RAISE EXCEPTION 'Session not found with token: %', p_old_token;
+    END IF;
 END;
-$$;
+$$ LANGUAGE plpgsql;
 
 -- Create procedure to delete expired sessions
 CREATE OR REPLACE PROCEDURE delete_expired_sessions()
