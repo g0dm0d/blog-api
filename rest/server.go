@@ -60,7 +60,13 @@ func (s *Server) SetupRouter() {
 	s.router.Route("/user", func(r chi.Router) {
 		r.Use(mw.Auth)
 		r.Method("GET", "/check", req.NewHandler(s.service.User.Check))
+		r.Method("POST", "/upload", req.NewHandler(s.service.Article.UploadImage))
 	})
+
+	s.router.Route("/assets", func(r chi.Router) {
+		r.Method("GET", "/{file}", req.NewHandler(s.service.Article.SendFile))
+	})
+
 	s.server.Handler = s.router
 }
 

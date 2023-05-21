@@ -6,9 +6,10 @@ import (
 )
 
 type ServerConfig struct {
-	Addr   string
-	Port   string
-	Secret string
+	Addr      string
+	Port      string
+	Secret    string
+	AssetsDir string
 }
 
 type Database struct {

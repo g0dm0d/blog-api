@@ -50,7 +50,13 @@ func main() {
 	tokenManager := tokenmanager.New(cfg.Server.Secret)
 
 	// Services
-	services := service.New(userStore, sessionStore, *tokenManager)
+	services := service.New(service.ServiceOpts{
+		UserStore:    userStore,
+		SessionStore: sessionStore,
+		Token:        *tokenManager,
+		// need for store img
+		AssetsDir: cfg.Server.AssetsDir,
+	})
 
 	// generate params for http server
 	server := rest.NewServer(&rest.Config{

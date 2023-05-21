@@ -58,7 +58,7 @@ func (t *Tool) GenerateAccessToken(user model.User) (string, error) {
 }
 
 func (t *Tool) GenerateRefreshToken() (string, error) {
-	refreshToken, err := generateRandomSalt(RefreshTokenLength)
+	refreshToken, err := GenerateRandomSalt(RefreshTokenLength)
 	if err != nil {
 		return "", err
 	}
@@ -82,7 +82,7 @@ func (t *Tool) ValidateJWTToken(token string) (*Claims, error) {
 	return claims, nil
 }
 
-func generateRandomSalt(length int) (string, error) {
+func GenerateRandomSalt(length int) (string, error) {
 	salt := make([]byte, length)
 
 	_, err := rand.Read(salt)

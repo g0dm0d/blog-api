@@ -8,6 +8,8 @@
 *.so
 *.dylib
 
+/assets/
+
 config.toml
 
 # IDE folders
