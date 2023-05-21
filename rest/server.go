@@ -45,6 +45,7 @@ func (s *Server) RunServer() error {
 }
 
 func (s *Server) SetupRouter() {
+	// setup cors
 	s.setupCors()
 
 	// middleware
@@ -56,9 +57,9 @@ func (s *Server) SetupRouter() {
 		r.Method("POST", "/refresh", req.NewHandler(s.service.User.Refresh))
 	})
 
-	s.router.Route("/", func(r chi.Router) {
+	s.router.Route("/user", func(r chi.Router) {
 		r.Use(mw.Auth)
-		r.Method("GET", "/me", req.NewHandler(s.service.User.Me))
+		r.Method("GET", "/check", req.NewHandler(s.service.User.Check))
 	})
 	s.server.Handler = s.router
 }

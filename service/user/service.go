@@ -9,7 +9,7 @@ import (
 type User interface {
 	Signup(ctx *req.Ctx) error
 	Signin(ctx *req.Ctx) error
-	Me(ctx *req.Ctx) error
+	Check(ctx *req.Ctx) error
 	Refresh(ctx *req.Ctx) error
 }
 
