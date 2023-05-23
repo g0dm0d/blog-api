@@ -1,9 +1,9 @@
 package user
 
 import (
+	"blog-api/pkg/errs"
 	"blog-api/rest/req"
 	"blog-api/store"
-	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -19,7 +19,10 @@ func (s *Service) Signup(ctx *req.Ctx) error {
 
 	err := ctx.ParseJSON(&r)
 	if err != nil {
-		return fmt.Errorf("error parsing sign up request -> %w", err)
+		if err != nil {
+			errs.ReturnError(ctx.Writer, errs.InvalidJSON)
+			return nil
+		}
 	}
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(r.Password), bcrypt.DefaultCost)

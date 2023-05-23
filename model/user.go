@@ -6,7 +6,7 @@ import (
 )
 
 type User struct {
-	Id        string
+	ID        int
 	Username  string
 	Email     string
 	Password  string
@@ -16,7 +16,7 @@ type User struct {
 
 func NewUser(u store.User) User {
 	return User{
-		Id:        u.Id,
+		ID:        u.ID,
 		Username:  u.Username,
 		Email:     u.Email,
 		Password:  u.Password,

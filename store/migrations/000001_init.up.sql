@@ -118,3 +118,68 @@ BEGIN
     WHERE expires_at < NOW();
 END;
 $$;
+
+
+
+-- Create the table 'articles'
+CREATE TABLE IF NOT EXISTS articles (
+    id          SERIAL          PRIMARY KEY,
+    name        VARCHAR(100)    NOT NULL,
+    markdown    TEXT            NOT NULL,
+    tags        TEXT[],
+    preview     VARCHAR(100),
+    author_id   INT             NOT NULL REFERENCES users(id),
+    created_at  TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create insert article procedure
+CREATE OR REPLACE PROCEDURE create_article(
+    p_name      VARCHAR(100),
+    p_markdown  TEXT,
+    p_tags      TEXT[],
+    p_preview   VARCHAR(100),
+    p_author    INT
+) LANGUAGE plpgsql AS $$
+BEGIN
+    INSERT INTO articles (name, markdown, tags, preview, author_id)
+    VALUES (p_name, p_markdown, p_tags, p_preview, p_author);
+END;
+$$;
+
+-- Create search article by tags func
+CREATE OR REPLACE FUNCTION search_article_by_tags(
+    IN v_tags TEXT[]
+)
+RETURNS TABLE (
+    p_id        INT,
+    p_name      VARCHAR,
+    p_tags      TEXT[],
+    p_preview   VARCHAR,
+    p_author    INT
+) LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT id, name, tags, preview, author_id
+    FROM articles
+    WHERE tags @> v_tags;
+END;
+$$;
+
+-- Create get article by id func
+CREATE OR REPLACE FUNCTION get_article_by_id(
+    IN v_id INT
+)
+RETURNS TABLE (
+    p_name      VARCHAR,
+    p_markdown  TEXT,
+    p_tags      TEXT[],
+    p_preview   VARCHAR,
+    p_author    INT
+) LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT name, markdown, tags, preview, author_id
+    FROM articles
+    WHERE id = v_id;
+END;
+$$;

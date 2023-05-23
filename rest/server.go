@@ -67,6 +67,16 @@ func (s *Server) SetupRouter() {
 		r.Method("GET", "/{file}", req.NewHandler(s.service.Article.SendFile))
 	})
 
+	s.router.Route("/article", func(r chi.Router) {
+		r.Use(mw.Auth)
+		r.Method("POST", "/new", req.NewHandler(s.service.Article.NewArticle))
+	})
+
+	s.router.Group(func(r chi.Router) {
+		r.Method("GET", "/article/{id}", req.NewHandler(s.service.Article.GetArticle))
+
+	})
+
 	s.server.Handler = s.router
 }
 

@@ -1,6 +1,7 @@
 package user
 
 import (
+	"blog-api/pkg/errs"
 	"blog-api/rest/req"
 	"blog-api/tools/tokenmanager"
 )
@@ -12,6 +13,7 @@ type CheckResponse struct {
 func (s *Service) Check(ctx *req.Ctx) error {
 	user, err := s.tokenManager.ValidateJWTToken(ctx.BearerToken())
 	if err != nil {
+		errs.ReturnError(ctx.Writer, errs.AccessTokenHasExpired)
 		return err
 	}
 

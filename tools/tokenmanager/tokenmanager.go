@@ -32,7 +32,7 @@ const (
 
 type Claims struct {
 	Username string `json:"username"`
-	UserID   string `json:"user_id"`
+	UserID   int    `json:"user_id"`
 	Role     int16  `json:"role"`
 	jwt.RegisteredClaims
 }
@@ -43,7 +43,7 @@ func (t *Tool) GenerateAccessToken(user model.User) (string, error) {
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(AccessLiveTime)),
 		},
 		Username: user.Username,
-		UserID:   user.Id,
+		UserID:   user.ID,
 		Role:     user.Role,
 	}
 

@@ -15,6 +15,7 @@ type Service struct {
 type ServiceOpts struct {
 	UserStore    store.UserStore
 	SessionStore store.SessionStore
+	ArticleStore store.ArticleStore
 	Token        tokenmanager.Tool
 	AssetsDir    string
 }
@@ -22,6 +23,6 @@ type ServiceOpts struct {
 func New(s ServiceOpts) *Service {
 	return &Service{
 		User:    user.New(s.UserStore, s.SessionStore, s.Token),
-		Article: article.New(s.Token, s.AssetsDir),
+		Article: article.New(s.UserStore, s.ArticleStore, s.Token, s.AssetsDir),
 	}
 }

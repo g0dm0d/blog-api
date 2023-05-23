@@ -11,7 +11,7 @@ type Session struct {
 }
 
 type CreateSessionOpts struct {
-	UserId       string
+	UserId       int
 	RefreshToken string
 }
 

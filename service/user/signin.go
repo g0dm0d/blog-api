@@ -2,9 +2,9 @@ package user
 
 import (
 	"blog-api/model"
+	"blog-api/pkg/errs"
 	"blog-api/rest/req"
 	"blog-api/store"
-	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -24,25 +24,29 @@ func (s *Service) Signin(ctx *req.Ctx) error {
 
 	err := ctx.ParseJSON(&r)
 	if err != nil {
-		return fmt.Errorf("error parsing sign up request -> %w", err)
+		errs.ReturnError(ctx.Writer, errs.InvalidJSON)
+		return nil
 	}
 
 	user, err := s.userStore.GetUserByLogin(store.GetUserOpts{
 		Login: r.Login,
 	})
 	if err != nil {
-		return err
+		errs.ReturnError(ctx.Writer, errs.IncorrectLoginOrPassword)
+		return nil
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(r.Password))
 	if err != nil {
-		return err
+		errs.ReturnError(ctx.Writer, errs.IncorrectLoginOrPassword)
+		return nil
 	}
+
 	accessToken, err := s.tokenManager.GenerateAccessToken(model.NewUser(user))
 	refreshToken, err := s.tokenManager.GenerateRefreshToken()
 
 	err = s.sessionStore.CreateSession(store.CreateSessionOpts{
-		UserId:       user.Id,
+		UserId:       user.ID,
 		RefreshToken: refreshToken,
 	})
 

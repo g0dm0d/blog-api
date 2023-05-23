@@ -28,6 +28,7 @@ func main() {
 	// Stores
 	userStore := postgres.NewUserStore(db)
 	sessionStore := postgres.NewSessionStore(db)
+	articleStore := postgres.NewArticleStore(db)
 
 	// Cron
 	c := cron.NewCron()
@@ -53,6 +54,7 @@ func main() {
 	services := service.New(service.ServiceOpts{
 		UserStore:    userStore,
 		SessionStore: sessionStore,
+		ArticleStore: articleStore,
 		Token:        *tokenManager,
 		// need for store img
 		AssetsDir: cfg.Server.AssetsDir,
