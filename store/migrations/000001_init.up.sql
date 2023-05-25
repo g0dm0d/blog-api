@@ -3,6 +3,8 @@ CREATE TABLE IF NOT EXISTS users (
     id          SERIAL PRIMARY KEY,
     username    VARCHAR(50)     NOT NULL UNIQUE
     CONSTRAINT CH_user_name CHECK (LENGTH(username) >= 3),
+    name        VARCHAR(100)    NOT NULL,
+    bio         VARCHAR(200)    DEFAULT NULL,
     email       VARCHAR(100)    NOT NULL UNIQUE
     CONSTRAINT CH_user_email CHECK (email ~* '^[A-Za-z0-9._+%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'),
     password    VARCHAR(100)    NOT NULL,
@@ -17,8 +19,8 @@ CREATE OR REPLACE PROCEDURE create_user(
     p_password  VARCHAR(50)
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO Users (username, email, password)
-    VALUES (p_username, p_email, p_password);
+    INSERT INTO Users (username, name, email, password)
+    VALUES (p_username, p_username, p_email, p_password);
     EXCEPTION
         WHEN unique_violation THEN
             RAISE NOTICE 'The email or username already exists.';
@@ -34,6 +36,8 @@ CREATE OR REPLACE FUNCTION get_user_by_email_or_username(
 RETURNS TABLE (
     p_id        INT,
     p_username  VARCHAR,
+    p_name      VARCHAR,
+    p_bio       VARCHAR,
     p_email     VARCHAR,
     p_password  VARCHAR,
     p_role      SMALLINT,
@@ -41,7 +45,7 @@ RETURNS TABLE (
 ) LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
-    SELECT id, username, email, password, role, created_at
+    SELECT id, username, name, bio, email, password, role, created_at
     FROM users
     WHERE email = email_or_username OR username = email_or_username;
 END;
@@ -54,6 +58,8 @@ CREATE OR REPLACE FUNCTION get_user_by_id(
 RETURNS TABLE (
     p_id        INT,
     p_username  VARCHAR,
+    p_name      VARCHAR,
+    p_bio       VARCHAR,
     p_email     VARCHAR,
     p_password  VARCHAR,
     p_role      SMALLINT,
@@ -61,9 +67,31 @@ RETURNS TABLE (
 ) LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
-    SELECT id, username, email, password, role, created_at
+    SELECT id, username, name, bio, email, password, role, created_at
     FROM users
     WHERE id = search_id;
+END;
+$$;
+
+-- Create get user by username func
+CREATE OR REPLACE FUNCTION get_user_by_username(
+    IN v_username VARCHAR
+)
+RETURNS TABLE (
+    p_id        INT,
+    p_username  VARCHAR,
+    p_name      VARCHAR,
+    p_bio       VARCHAR,
+    p_email     VARCHAR,
+    p_password  VARCHAR,
+    p_role      SMALLINT,
+    p_created_at TIMESTAMP
+) LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT id, username, name, bio, email, password, role, created_at
+    FROM users
+    WHERE username = username;
 END;
 $$;
 
@@ -124,7 +152,7 @@ $$;
 -- Create the table 'articles'
 CREATE TABLE IF NOT EXISTS articles (
     id          SERIAL          PRIMARY KEY,
-    name        VARCHAR(100)    NOT NULL,
+    title       VARCHAR(100)    NOT NULL,
     markdown    TEXT            NOT NULL,
     tags        TEXT[],
     preview     VARCHAR(100),
@@ -134,15 +162,15 @@ CREATE TABLE IF NOT EXISTS articles (
 
 -- Create insert article procedure
 CREATE OR REPLACE PROCEDURE create_article(
-    p_name      VARCHAR(100),
+    p_title     VARCHAR(100),
     p_markdown  TEXT,
     p_tags      TEXT[],
     p_preview   VARCHAR(100),
     p_author    INT
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO articles (name, markdown, tags, preview, author_id)
-    VALUES (p_name, p_markdown, p_tags, p_preview, p_author);
+    INSERT INTO articles (title, markdown, tags, preview, author_id)
+    VALUES (p_title, p_markdown, p_tags, p_preview, p_author);
 END;
 $$;
 
@@ -152,14 +180,14 @@ CREATE OR REPLACE FUNCTION search_article_by_tags(
 )
 RETURNS TABLE (
     p_id        INT,
-    p_name      VARCHAR,
+    p_title     VARCHAR,
     p_tags      TEXT[],
     p_preview   VARCHAR,
     p_author    INT
 ) LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
-    SELECT id, name, tags, preview, author_id
+    SELECT id, title, tags, preview, author_id
     FROM articles
     WHERE tags @> v_tags;
 END;
@@ -170,15 +198,16 @@ CREATE OR REPLACE FUNCTION get_article_by_id(
     IN v_id INT
 )
 RETURNS TABLE (
-    p_name      VARCHAR,
-    p_markdown  TEXT,
-    p_tags      TEXT[],
-    p_preview   VARCHAR,
-    p_author    INT
+    p_title         VARCHAR,
+    p_markdown      TEXT,
+    p_tags          TEXT[],
+    p_preview       VARCHAR,
+    p_author        INT,
+    p_created_at    TIMESTAMP
 ) LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
-    SELECT name, markdown, tags, preview, author_id
+    SELECT title, markdown, tags, preview, author_id, created_at
     FROM articles
     WHERE id = v_id;
 END;

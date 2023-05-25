@@ -4,7 +4,7 @@ import "time"
 
 type Article struct {
 	ID         int
-	Name       string
+	Title      string
 	Markdown   string
 	Tags       []string
 	Preview    string
@@ -13,7 +13,7 @@ type Article struct {
 }
 
 type CreateArticleOpts struct {
-	Name     string
+	Title    string
 	Markdown string
 	Tags     []string
 	Preview  string

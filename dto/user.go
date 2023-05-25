@@ -10,7 +10,10 @@ type User struct {
 }
 
 type UserPublic struct {
+	ID       int    `json:"id"`
 	Username string `json:"username"`
+	Name     string `json:"name"`
+	Bio      string `json:"bio"`
 }
 
 func NewUser(u model.User) User {
@@ -24,6 +27,9 @@ func NewUser(u model.User) User {
 
 func NewUserPublic(u model.User) UserPublic {
 	return UserPublic{
+		ID:       u.ID,
 		Username: u.Username,
+		Name:     u.Name,
+		Bio:      u.Bio,
 	}
 }

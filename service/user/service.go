@@ -11,6 +11,7 @@ type User interface {
 	Signin(ctx *req.Ctx) error
 	Check(ctx *req.Ctx) error
 	Refresh(ctx *req.Ctx) error
+	GetByUsername(ctx *req.Ctx) error
 }
 
 type Service struct {

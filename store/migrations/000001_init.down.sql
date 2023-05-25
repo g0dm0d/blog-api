@@ -12,3 +12,4 @@ DROP TABLE IF EXISTS users;
 DROP PROCEDURE IF EXISTS insert_user;
 DROP FUNCTION IF EXISTS get_user_by_email_or_username;
 DROP FUNCTION IF EXISTS get_user_by_id;
+DROP FUNCTION IF EXISTS get_user_by_username;

@@ -26,17 +26,28 @@ func (s *UserStore) CreateUser(opts store.CreateUserOpts) (store.User, error) {
 func (s *UserStore) GetUserByLogin(opts store.GetUserOpts) (store.User, error) {
 	var user store.User
 	req := s.db.QueryRow("SELECT * FROM get_user_by_email_or_username($1)", opts.Login)
-	err := req.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Role, &user.CreatedAt)
+	err := req.Scan(&user.ID, &user.Username, &user.Name, &user.Bio, &user.Email, &user.Password, &user.Role, &user.CreatedAt)
 	if err != nil {
 		return user, err
 	}
 	return user, nil
 }
 
-func (s *UserStore) GetUserByID(userID int) (store.User, error) {
+// GetUserByLogin Login is email or username
+func (s *UserStore) GetUserByUsername(opts store.GetUserOpts) (store.User, error) {
 	var user store.User
-	req := s.db.QueryRow("SELECT * FROM get_user_by_id($1)", userID)
-	err := req.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Role, &user.CreatedAt)
+	req := s.db.QueryRow("SELECT * FROM get_user_by_username($1)", opts.Username)
+	err := req.Scan(&user.ID, &user.Username, &user.Name, &user.Bio, &user.Email, &user.Password, &user.Role, &user.CreatedAt)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
+
+func (s *UserStore) GetUserByID(opts store.GetUserOpts) (store.User, error) {
+	var user store.User
+	req := s.db.QueryRow("SELECT * FROM get_user_by_id($1)", opts.ID)
+	err := req.Scan(&user.ID, &user.Username, &user.Name, &user.Bio, &user.Email, &user.Password, &user.Role, &user.CreatedAt)
 	if err != nil {
 		return user, err
 	}

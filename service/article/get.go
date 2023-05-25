@@ -6,16 +6,18 @@ import (
 	"blog-api/rest/req"
 	"blog-api/store"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 )
 
 type GetArticleResponse struct {
-	Name     string         `json:"name"`
-	Markdown string         `json:"markdown"`
-	Tags     []string       `json:"tags"`
-	Preview  string         `json:"preview"`
-	Author   dto.UserPublic `json:"author"`
+	Title     string         `json:"title"`
+	Markdown  string         `json:"markdown"`
+	Tags      []string       `json:"tags"`
+	Preview   string         `json:"preview"`
+	Create_at time.Time      `json:"created_at"`
+	Author    dto.UserPublic `json:"author"`
 }
 
 func (s *Service) GetArticle(ctx *req.Ctx) error {
@@ -32,16 +34,17 @@ func (s *Service) GetArticle(ctx *req.Ctx) error {
 		return err
 	}
 
-	user, err := s.userStore.GetUserByID(article.Author_id)
+	user, err := s.userStore.GetUserByID(store.GetUserOpts{ID: article.Author_id})
 	if err != nil {
 		return err
 	}
 
 	return ctx.JSON(GetArticleResponse{
-		Name:     article.Name,
-		Markdown: article.Markdown,
-		Tags:     article.Tags,
-		Preview:  article.Preview,
-		Author:   dto.NewUserPublic(model.NewUser(user)),
+		Title:     article.Title,
+		Markdown:  article.Markdown,
+		Tags:      article.Tags,
+		Preview:   article.Preview,
+		Create_at: article.Created_at,
+		Author:    dto.NewUserPublic(model.NewUser(user)),
 	})
 }

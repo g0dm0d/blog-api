@@ -7,7 +7,7 @@ import (
 )
 
 type NewArticleRequest struct {
-	Name     string   `json:"name"`
+	Title    string   `json:"title"`
 	Markdown string   `json:"markdown"`
 	Tags     []string `json:"tags"`
 	Preview  string   `json:"preview"`
@@ -28,7 +28,7 @@ func (s *Service) NewArticle(ctx *req.Ctx) error {
 	}
 
 	err = s.articleStore.CreateArticle(store.CreateArticleOpts{
-		Name:     r.Name,
+		Title:    r.Title,
 		Markdown: r.Markdown,
 		Tags:     r.Tags,
 		Preview:  r.Preview,

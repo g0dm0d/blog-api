@@ -8,6 +8,8 @@ import (
 type User struct {
 	ID        int
 	Username  string
+	Name      string
+	Bio       string
 	Email     string
 	Password  string
 	Role      int16
@@ -18,6 +20,8 @@ func NewUser(u store.User) User {
 	return User{
 		ID:        u.ID,
 		Username:  u.Username,
+		Name:      u.Name,
+		Bio:       u.Bio.String,
 		Email:     u.Email,
 		Password:  u.Password,
 		Role:      u.Role,

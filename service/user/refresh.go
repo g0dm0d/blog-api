@@ -33,7 +33,7 @@ func (s *Service) Refresh(ctx *req.Ctx) error {
 		return err
 	}
 
-	user, err := s.userStore.GetUserByID(userID)
+	user, err := s.userStore.GetUserByID(store.GetUserOpts{ID: userID})
 	if err != nil {
 		return err
 	}
