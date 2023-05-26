@@ -153,9 +153,10 @@ $$;
 CREATE TABLE IF NOT EXISTS articles (
     id          SERIAL          PRIMARY KEY,
     title       VARCHAR(100)    NOT NULL,
+    path        VARCHAR(105)    NOT NULL,
     markdown    TEXT            NOT NULL,
     tags        TEXT[],
-    preview     VARCHAR(100),
+    preview     VARCHAR(200),
     author_id   INT             NOT NULL REFERENCES users(id),
     created_at  TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
 );
@@ -163,14 +164,15 @@ CREATE TABLE IF NOT EXISTS articles (
 -- Create insert article procedure
 CREATE OR REPLACE PROCEDURE create_article(
     p_title     VARCHAR(100),
+    p_path      VARCHAR(105),
     p_markdown  TEXT,
     p_tags      TEXT[],
     p_preview   VARCHAR(100),
     p_author    INT
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO articles (title, markdown, tags, preview, author_id)
-    VALUES (p_title, p_markdown, p_tags, p_preview, p_author);
+    INSERT INTO articles (title, path, markdown, tags, preview, author_id)
+    VALUES (p_title, p_path, p_markdown, p_tags, p_preview, p_author);
 END;
 $$;
 
@@ -180,6 +182,7 @@ CREATE OR REPLACE FUNCTION search_article_by_tags(
 )
 RETURNS TABLE (
     p_id        INT,
+    p_path      VARCHAR,
     p_title     VARCHAR,
     p_tags      TEXT[],
     p_preview   VARCHAR,
@@ -187,7 +190,7 @@ RETURNS TABLE (
 ) LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
-    SELECT id, title, tags, preview, author_id
+    SELECT id, title, path, tags, preview, author_id
     FROM articles
     WHERE tags @> v_tags;
 END;
@@ -196,6 +199,27 @@ $$;
 -- Create get article by id func
 CREATE OR REPLACE FUNCTION get_article_by_id(
     IN v_id INT
+)
+RETURNS TABLE (
+    p_title         VARCHAR,
+    p_path          VARCHAR,
+    p_markdown      TEXT,
+    p_tags          TEXT[],
+    p_preview       VARCHAR,
+    p_author        INT,
+    p_created_at    TIMESTAMP
+) LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT title, path, markdown, tags, preview, author_id, created_at
+    FROM articles
+    WHERE id = v_id;
+END;
+$$;
+
+-- Create get article by path func
+CREATE OR REPLACE FUNCTION get_article_by_path(
+    IN v_path VARCHAR
 )
 RETURNS TABLE (
     p_title         VARCHAR,
@@ -209,6 +233,29 @@ BEGIN
     RETURN QUERY
     SELECT title, markdown, tags, preview, author_id, created_at
     FROM articles
-    WHERE id = v_id;
+    WHERE path = v_path;
 END;
 $$;
+
+-- Create get article for feed
+CREATE OR REPLACE FUNCTION get_article_feed(
+    IN v_last INT
+)
+RETURNS TABLE (
+    p_title         VARCHAR,
+    p_path          VARCHAR,
+    p_markdown      TEXT,
+    p_tags          TEXT[],
+    p_preview       VARCHAR,
+    p_author        INT,
+    p_created_at    TIMESTAMP
+) LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT title, path, markdown, tags, preview, author_id, created_at
+    FROM articles
+    WHERE id <= (SELECT (id - 15 * v_last) FROM articles ORDER BY 1 DESC LIMIT 1)
+    ORDER BY id desc limit 15;
+END;
+$$;
+

@@ -4,6 +4,8 @@ import (
 	"blog-api/pkg/errs"
 	"blog-api/rest/req"
 	"blog-api/store"
+	"blog-api/tools/chars"
+	"blog-api/tools/tokenmanager"
 )
 
 type NewArticleRequest struct {
@@ -11,6 +13,10 @@ type NewArticleRequest struct {
 	Markdown string   `json:"markdown"`
 	Tags     []string `json:"tags"`
 	Preview  string   `json:"preview"`
+}
+
+type NewArticleResponse struct {
+	Path string `json:"path"`
 }
 
 func (s *Service) NewArticle(ctx *req.Ctx) error {
@@ -27,8 +33,16 @@ func (s *Service) NewArticle(ctx *req.Ctx) error {
 		return err
 	}
 
+	pathSalt, err := tokenmanager.GenerateRandomSalt(2)
+	if err != nil {
+		return err
+	}
+
+	path := chars.ToLatin(r.Title) + "-" + pathSalt
+
 	err = s.articleStore.CreateArticle(store.CreateArticleOpts{
 		Title:    r.Title,
+		Path:     path,
 		Markdown: r.Markdown,
 		Tags:     r.Tags,
 		Preview:  r.Preview,
@@ -38,5 +52,5 @@ func (s *Service) NewArticle(ctx *req.Ctx) error {
 		return err
 	}
 
-	return nil
+	return ctx.JSON(NewArticleResponse{Path: path})
 }

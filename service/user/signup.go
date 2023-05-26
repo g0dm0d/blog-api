@@ -19,10 +19,8 @@ func (s *Service) Signup(ctx *req.Ctx) error {
 
 	err := ctx.ParseJSON(&r)
 	if err != nil {
-		if err != nil {
-			errs.ReturnError(ctx.Writer, errs.InvalidJSON)
-			return nil
-		}
+		errs.ReturnError(ctx.Writer, errs.InvalidJSON)
+		return nil
 	}
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(r.Password), bcrypt.DefaultCost)

@@ -6,29 +6,15 @@ import (
 	"blog-api/rest/req"
 	"blog-api/store"
 	"strconv"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 )
 
-type GetArticleResponse struct {
-	Title     string         `json:"title"`
-	Markdown  string         `json:"markdown"`
-	Tags      []string       `json:"tags"`
-	Preview   string         `json:"preview"`
-	Create_at time.Time      `json:"created_at"`
-	Author    dto.UserPublic `json:"author"`
-}
-
 func (s *Service) GetArticle(ctx *req.Ctx) error {
-	idStr := chi.URLParam(ctx.Request, "id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		return err
-	}
+	path := chi.URLParam(ctx.Request, "path")
 
 	article, err := s.articleStore.GetArticle(store.GetArticleOpts{
-		ID: id,
+		Path: path,
 	})
 	if err != nil {
 		return err
@@ -39,12 +25,32 @@ func (s *Service) GetArticle(ctx *req.Ctx) error {
 		return err
 	}
 
-	return ctx.JSON(GetArticleResponse{
-		Title:     article.Title,
-		Markdown:  article.Markdown,
-		Tags:      article.Tags,
-		Preview:   article.Preview,
-		Create_at: article.Created_at,
-		Author:    dto.NewUserPublic(model.NewUser(user)),
-	})
+	return ctx.JSON(dto.NewArticle(model.NewArticle(article), dto.NewUserPublic(model.NewUser(user))))
+}
+
+func (s *Service) GetArticleForFeed(ctx *req.Ctx) error {
+	page := ctx.Request.URL.Query().Get("page")
+	if page == "" {
+		page = "0"
+	}
+	pageInt, err := strconv.Atoi(page)
+	if err != nil {
+		return err
+	}
+
+	articles, err := s.articleStore.GetArticleForFeed(store.GetArticleFeed{Page: pageInt})
+	if err != nil {
+		return err
+	}
+
+	var users []store.User
+	for _, article := range articles {
+		user, err := s.userStore.GetUserByID(store.GetUserOpts{ID: article.Author_id})
+		if err != nil {
+			return err
+		}
+		users = append(users, user)
+	}
+
+	return ctx.JSON(dto.NewArticles(model.NewArticles(articles), dto.NewUsersPublic(model.NewUsers(users))))
 }

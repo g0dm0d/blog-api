@@ -11,6 +11,7 @@ type Article interface {
 	SendFile(ctx *req.Ctx) error
 	GetArticle(ctx *req.Ctx) error
 	NewArticle(ctx *req.Ctx) error
+	GetArticleForFeed(ctx *req.Ctx) error
 }
 
 type Service struct {

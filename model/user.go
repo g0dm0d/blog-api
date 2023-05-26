@@ -28,3 +28,11 @@ func NewUser(u store.User) User {
 		CreatedAt: u.CreatedAt,
 	}
 }
+
+func NewUsers(u []store.User) []User {
+	var users []User
+	for i := range u {
+		users = append(users, NewUser(u[i]))
+	}
+	return users
+}

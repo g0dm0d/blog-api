@@ -33,3 +33,11 @@ func NewUserPublic(u model.User) UserPublic {
 		Bio:      u.Bio,
 	}
 }
+
+func NewUsersPublic(u []model.User) []UserPublic {
+	var usersPublic []UserPublic
+	for i := range u {
+		usersPublic = append(usersPublic, NewUserPublic(u[i]))
+	}
+	return usersPublic
+}
