@@ -9,6 +9,7 @@ type User struct {
 	ID        int
 	Username  string
 	Name      string
+	Avatar    string
 	Bio       string
 	Email     string
 	Password  string
@@ -21,6 +22,7 @@ func NewUser(u store.User) User {
 		ID:        u.ID,
 		Username:  u.Username,
 		Name:      u.Name,
+		Avatar:    u.Avatar.String,
 		Bio:       u.Bio.String,
 		Email:     u.Email,
 		Password:  u.Password,

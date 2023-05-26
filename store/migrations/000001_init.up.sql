@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     username    VARCHAR(50)     NOT NULL UNIQUE
     CONSTRAINT CH_user_name CHECK (LENGTH(username) >= 3),
     name        VARCHAR(100)    NOT NULL,
+    avatar      VARCHAR(200)    DEFAULT NULL,
     bio         VARCHAR(200)    DEFAULT NULL,
     email       VARCHAR(100)    NOT NULL UNIQUE
     CONSTRAINT CH_user_email CHECK (email ~* '^[A-Za-z0-9._+%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'),
@@ -23,9 +24,9 @@ BEGIN
     VALUES (p_username, p_username, p_email, p_password);
     EXCEPTION
         WHEN unique_violation THEN
-            RAISE NOTICE 'The email or username already exists.';
+            RAISE EXCEPTION 'The email or username already exists.';
         WHEN check_violation THEN
-            RAISE NOTICE 'One or more input parameters violate the constraints.';
+            RAISE EXCEPTION 'One or more input parameters violate the constraints.';
 END;
 $$;
 
@@ -37,6 +38,7 @@ RETURNS TABLE (
     p_id        INT,
     p_username  VARCHAR,
     p_name      VARCHAR,
+    p_avatar    VARCHAR,
     p_bio       VARCHAR,
     p_email     VARCHAR,
     p_password  VARCHAR,
@@ -45,7 +47,7 @@ RETURNS TABLE (
 ) LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
-    SELECT id, username, name, bio, email, password, role, created_at
+    SELECT id, username, name, avatar, bio, email, password, role, created_at
     FROM users
     WHERE email = email_or_username OR username = email_or_username;
 END;
@@ -59,6 +61,7 @@ RETURNS TABLE (
     p_id        INT,
     p_username  VARCHAR,
     p_name      VARCHAR,
+    p_avatar    VARCHAR,
     p_bio       VARCHAR,
     p_email     VARCHAR,
     p_password  VARCHAR,
@@ -67,7 +70,7 @@ RETURNS TABLE (
 ) LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
-    SELECT id, username, name, bio, email, password, role, created_at
+    SELECT id, username, name, avatar, bio, email, password, role, created_at
     FROM users
     WHERE id = search_id;
 END;
@@ -89,7 +92,7 @@ RETURNS TABLE (
 ) LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
-    SELECT id, username, name, bio, email, password, role, created_at
+    SELECT id, username, name, avatar, bio, email, password, role, created_at
     FROM users
     WHERE username = username;
 END;

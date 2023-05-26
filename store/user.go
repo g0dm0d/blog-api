@@ -9,6 +9,7 @@ type User struct {
 	ID        int
 	Username  string
 	Name      string
+	Avatar    sql.NullString
 	Bio       sql.NullString
 	Email     string
 	Password  string

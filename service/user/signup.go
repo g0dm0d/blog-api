@@ -1,6 +1,8 @@
 package user
 
 import (
+	"blog-api/dto"
+	"blog-api/model"
 	"blog-api/pkg/errs"
 	"blog-api/rest/req"
 	"blog-api/store"
@@ -30,5 +32,16 @@ func (s *Service) Signup(ctx *req.Ctx) error {
 		Password: string(passwordHash),
 		Email:    r.Email,
 	})
-	return err
+	if err != nil {
+		errs.ReturnError(ctx.Writer, errs.UserAlreadyExists)
+		return nil
+	}
+
+	user, err := s.userStore.GetUserByLogin(store.GetUserOpts{Login: r.Username})
+	if err != nil {
+		errs.ReturnError(ctx.Writer, errs.InternalServerError)
+		return err
+	}
+
+	return ctx.JSON(dto.NewUser(model.NewUser(user)))
 }

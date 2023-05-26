@@ -9,7 +9,8 @@ type Code struct {
 
 var (
 	// System
-	InvalidJSON = Code{Code: 100, Description: "Invalid JSON body"}
+	InternalServerError = Code{Code: 100, Description: "Internal server error"}
+	InvalidJSON         = Code{Code: 101, Description: "Invalid JSON body"}
 
 	// Auth codes
 	AccessTokenHasExpired       = Code{Code: 1001, Description: "Invalid credentials, try again."}
@@ -27,6 +28,11 @@ var (
 
 func HTTPStatusCode(c uint16) int {
 	switch c {
+	case InternalServerError.Code:
+		return http.StatusInsufficientStorage
+	case InvalidJSON.Code:
+		return http.StatusBadRequest
+
 	case AccessTokenHasExpired.Code:
 		return http.StatusUnauthorized
 	case AccessTokenInvalidFormat.Code:
@@ -34,6 +40,9 @@ func HTTPStatusCode(c uint16) int {
 	case AccessTokenInvalidSignature.Code:
 		return http.StatusUnauthorized
 	case IncorrectLoginOrPassword.Code:
+		return http.StatusUnauthorized
+
+	case UserAlreadyExists.Code:
 		return http.StatusUnauthorized
 
 	default:
