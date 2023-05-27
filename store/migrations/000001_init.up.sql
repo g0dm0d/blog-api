@@ -84,6 +84,7 @@ RETURNS TABLE (
     p_id        INT,
     p_username  VARCHAR,
     p_name      VARCHAR,
+    p_avatar    VARCHAR,
     p_bio       VARCHAR,
     p_email     VARCHAR,
     p_password  VARCHAR,
@@ -94,7 +95,7 @@ BEGIN
     RETURN QUERY
     SELECT id, username, name, avatar, bio, email, password, role, created_at
     FROM users
-    WHERE username = username;
+    WHERE username = v_username;
 END;
 $$;
 
@@ -204,6 +205,7 @@ CREATE OR REPLACE FUNCTION get_article_by_id(
     IN v_id INT
 )
 RETURNS TABLE (
+    p_id            INT,
     p_title         VARCHAR,
     p_path          VARCHAR,
     p_markdown      TEXT,
@@ -214,7 +216,7 @@ RETURNS TABLE (
 ) LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
-    SELECT title, path, markdown, tags, preview, author_id, created_at
+    SELECT id, title, path, markdown, tags, preview, author_id, created_at
     FROM articles
     WHERE id = v_id;
 END;
@@ -225,26 +227,7 @@ CREATE OR REPLACE FUNCTION get_article_by_path(
     IN v_path VARCHAR
 )
 RETURNS TABLE (
-    p_title         VARCHAR,
-    p_markdown      TEXT,
-    p_tags          TEXT[],
-    p_preview       VARCHAR,
-    p_author        INT,
-    p_created_at    TIMESTAMP
-) LANGUAGE plpgsql AS $$
-BEGIN
-    RETURN QUERY
-    SELECT title, markdown, tags, preview, author_id, created_at
-    FROM articles
-    WHERE path = v_path;
-END;
-$$;
-
--- Create get article for feed
-CREATE OR REPLACE FUNCTION get_article_feed(
-    IN v_last INT
-)
-RETURNS TABLE (
+    p_id            INT,
     p_title         VARCHAR,
     p_path          VARCHAR,
     p_markdown      TEXT,
@@ -255,10 +238,74 @@ RETURNS TABLE (
 ) LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
-    SELECT title, path, markdown, tags, preview, author_id, created_at
+    SELECT id, title, markdown, tags, preview, author_id, created_at
     FROM articles
-    WHERE id <= (SELECT (id - 15 * v_last) FROM articles ORDER BY 1 DESC LIMIT 1)
+    WHERE path = v_path;
+END;
+$$;
+
+-- Create get article for feed
+CREATE OR REPLACE FUNCTION get_article_feed(
+    IN v_last INT
+)
+RETURNS TABLE (
+    p_id            INT,
+    p_title         VARCHAR,
+    p_path          VARCHAR,
+    p_markdown      TEXT,
+    p_tags          TEXT[],
+    p_preview       VARCHAR,
+    p_author        INT,
+    p_created_at    TIMESTAMP
+) LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT id, title, path, markdown, tags, preview, author_id, created_at
+    FROM articles
+    WHERE id <= (SELECT (abs(v_last - id)) FROM articles ORDER BY 1 DESC LIMIT 1)
     ORDER BY id desc limit 15;
 END;
 $$;
 
+-- Create get user last article
+CREATE OR REPLACE FUNCTION get_user_article(
+    IN v_last    INT,
+    IN v_user_id INT
+)
+RETURNS TABLE (
+    p_id            INT,
+    p_title         VARCHAR,
+    p_path          VARCHAR,
+    p_markdown      TEXT,
+    p_tags          TEXT[],
+    p_preview       VARCHAR,
+    p_author        INT,
+    p_created_at    TIMESTAMP
+) LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT id, title, path, markdown, tags, preview, author_id, created_at
+    FROM articles
+    WHERE id <= (SELECT (abs(v_last - id)) FROM articles ORDER BY 1 DESC LIMIT 1)
+        AND author_id = v_user_id
+    ORDER BY id desc limit 15;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION search_article (
+	p_last    INT,
+    p_tags    TEXT[]    = NULL,
+    p_author  INT       = NULL,
+    p_text    VARCHAR   = NULL
+) RETURNS SETOF articles LANGUAGE plpgsql AS
+$$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM articles
+    WHERE (tags @> p_tags OR p_tags IS NULL)
+      AND (author_id = p_Author OR p_Author IS NULL)
+      AND (title ILIKE '%' || p_Text || '%' OR p_Text IS NULL)
+      AND id <= (SELECT (abs(p_last - id)) FROM articles ORDER BY 1 DESC LIMIT 1);
+END;
+$$;

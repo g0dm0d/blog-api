@@ -33,8 +33,16 @@ type GetArticleFeed struct {
 	Page int
 }
 
+type SearchArticleOpts struct {
+	Page     int
+	Tags     interface{}
+	Text     interface{}
+	AuthorID interface{}
+}
+
 type ArticleStore interface {
 	CreateArticle(opts CreateArticleOpts) error
 	GetArticle(opts GetArticleOpts) (Article, error)
+	SearchArticle(opts SearchArticleOpts) ([]Article, error)
 	GetArticleForFeed(opts GetArticleFeed) ([]Article, error)
 }

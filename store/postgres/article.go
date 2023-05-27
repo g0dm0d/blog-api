@@ -31,7 +31,7 @@ func (s *SessionStore) GetArticle(opts store.GetArticleOpts) (store.Article, err
 
 	res := s.db.QueryRow("SELECT * FROM get_article_by_path($1)", opts.Path)
 
-	err := res.Scan(&article.Title, &article.Markdown, pq.Array(&article.Tags), &article.Preview, &article.Author_id, &article.Created_at)
+	err := res.Scan(&article.ID, &article.Title, &article.Path, &article.Markdown, pq.Array(&article.Tags), &article.Preview, &article.Author_id, &article.Created_at)
 	if err != nil {
 		return store.Article{}, err
 	}
@@ -49,7 +49,35 @@ func (s *SessionStore) GetArticleForFeed(opts store.GetArticleFeed) ([]store.Art
 
 	for res.Next() {
 		var article store.Article
-		err = res.Scan(&article.Title, &article.Path, &article.Markdown, pq.Array(&article.Tags), &article.Preview, &article.Author_id, &article.Created_at)
+		err = res.Scan(&article.ID, &article.Title, &article.Path, &article.Markdown, pq.Array(&article.Tags), &article.Preview, &article.Author_id, &article.Created_at)
+		if err != nil {
+			return []store.Article{}, err
+		}
+
+		articles = append(articles, article)
+	}
+
+	return articles, nil
+}
+
+func (s *SessionStore) SearchArticle(opts store.SearchArticleOpts) ([]store.Article, error) {
+	var articles []store.Article
+
+	var authorIDParam interface{}
+	if opts.AuthorID != "" {
+		authorIDParam = opts.AuthorID
+	} else {
+		authorIDParam = nil
+	}
+
+	res, err := s.db.Query("SELECT * FROM search_article($1, $2, $3, $4)", opts.Page, pq.Array(opts.Tags), authorIDParam, opts.Text)
+	if err != nil {
+		return []store.Article{}, err
+	}
+
+	for res.Next() {
+		var article store.Article
+		err = res.Scan(&article.ID, &article.Title, &article.Path, &article.Markdown, pq.Array(&article.Tags), &article.Preview, &article.Author_id, &article.Created_at)
 		if err != nil {
 			return []store.Article{}, err
 		}

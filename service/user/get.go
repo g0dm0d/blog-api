@@ -6,12 +6,10 @@ import (
 	"blog-api/pkg/errs"
 	"blog-api/rest/req"
 	"blog-api/store"
-
-	"github.com/go-chi/chi/v5"
 )
 
 func (s *Service) GetByUsername(ctx *req.Ctx) error {
-	username := chi.URLParam(ctx.Request, "username")
+	username := ctx.Request.URL.Query().Get("username")
 
 	user, err := s.userStore.GetUserByUsername(store.GetUserOpts{Username: username})
 

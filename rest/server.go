@@ -74,8 +74,9 @@ func (s *Server) SetupRouter() {
 
 	s.router.Group(func(r chi.Router) {
 		r.Method("GET", "/feed_content", req.NewHandler(s.service.Article.GetArticleForFeed))
+		r.Method("GET", "/search_article", req.NewHandler(s.service.Article.SearchArticle))
 		r.Method("GET", "/article/{path}", req.NewHandler(s.service.Article.GetArticle))
-		r.Method("GET", "/@{username}", req.NewHandler(s.service.User.GetByUsername))
+		r.Method("GET", "/user/by_username", req.NewHandler(s.service.User.GetByUsername))
 	})
 
 	s.server.Handler = s.router

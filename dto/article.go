@@ -6,6 +6,7 @@ import (
 )
 
 type Article struct {
+	ID         int        `json:"id"`
 	Title      string     `json:"title"`
 	Path       string     `json:"path"`
 	Markdown   string     `json:"markdown"`
@@ -17,6 +18,7 @@ type Article struct {
 
 func NewArticle(a model.Article, u UserPublic) Article {
 	return Article{
+		ID:         a.ID,
 		Title:      a.Title,
 		Path:       a.Path,
 		Markdown:   a.Markdown,

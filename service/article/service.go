@@ -12,6 +12,7 @@ type Article interface {
 	GetArticle(ctx *req.Ctx) error
 	NewArticle(ctx *req.Ctx) error
 	GetArticleForFeed(ctx *req.Ctx) error
+	SearchArticle(ctx *req.Ctx) error
 }
 
 type Service struct {
