@@ -6,14 +6,14 @@ import (
 )
 
 type Article struct {
-	ID         int
-	Title      string
-	Path       string
-	Markdown   string
-	Tags       []string
-	Preview    sql.NullString
-	Author_id  int
-	Created_at time.Time
+	ID        int
+	Title     string
+	Path      string
+	Markdown  string
+	Tags      []string
+	Preview   sql.NullString
+	AuthorID  int
+	CreatedAt time.Time
 }
 
 type CreateArticleOpts struct {

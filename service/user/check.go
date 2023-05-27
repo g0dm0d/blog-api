@@ -13,19 +13,16 @@ type CheckResponse struct {
 func (s *Service) Check(ctx *req.Ctx) error {
 	user, err := s.tokenManager.ValidateJWTToken(ctx.BearerToken())
 	if err != nil {
-		errs.ReturnError(ctx.Writer, errs.AccessTokenHasExpired)
-		return err
+		return errs.ReturnError(ctx.Writer, errs.AccessTokenHasExpired)
 	}
 
 	if user == (&tokenmanager.Claims{}) {
-		ctx.JSON(CheckResponse{
+		return ctx.JSON(CheckResponse{
 			Status: false,
 		})
 	}
 
-	ctx.JSON(CheckResponse{
+	return ctx.JSON(CheckResponse{
 		Status: true,
 	})
-
-	return nil
 }

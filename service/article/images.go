@@ -1,6 +1,7 @@
 package article
 
 import (
+	"blog-api/pkg/errs"
 	"blog-api/rest/req"
 	"blog-api/tools/tokenmanager"
 	"encoding/base64"
@@ -26,7 +27,10 @@ type UploadImageResponse struct {
 func (s *Service) UploadImage(ctx *req.Ctx) error {
 	var r UploadImageRequest
 
-	ctx.ParseJSON(&r)
+	err := ctx.ParseJSON(&r)
+	if err != nil {
+		return errs.ReturnError(ctx.Writer, errs.InvalidJSON)
+	}
 
 	fileName, err := tokenmanager.GenerateRandomSalt(FileNameLength)
 	if err != nil {
@@ -42,7 +46,10 @@ func (s *Service) UploadImage(ctx *req.Ctx) error {
 
 	path := fmt.Sprintf("%s/%s", s.assetsDir, fileName)
 
-	os.WriteFile(path, img, 0644)
+	err = os.WriteFile(path, img, 0644)
+	if err != nil {
+		return errs.ReturnError(ctx.Writer, errs.InternalServerError)
+	}
 
 	return ctx.JSON(UploadImageResponse{Path: "assets/" + fileName})
 }
@@ -56,7 +63,9 @@ func (s *Service) SendFile(ctx *req.Ctx) error {
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "application/octet-stream")
-	ctx.Writer.Write(fileBytes)
-
+	_, err = ctx.Writer.Write(fileBytes)
+	if err != nil {
+		return errs.ReturnError(ctx.Writer, errs.InternalServerError)
+	}
 	return nil
 }

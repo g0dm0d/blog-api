@@ -24,22 +24,19 @@ func (s *Service) Signin(ctx *req.Ctx) error {
 
 	err := ctx.ParseJSON(&r)
 	if err != nil {
-		errs.ReturnError(ctx.Writer, errs.InvalidJSON)
-		return nil
+		return errs.ReturnError(ctx.Writer, errs.InvalidJSON)
 	}
 
 	user, err := s.userStore.GetUserByLogin(store.GetUserOpts{
 		Login: r.Login,
 	})
 	if err != nil {
-		errs.ReturnError(ctx.Writer, errs.IncorrectLoginOrPassword)
-		return nil
+		return errs.ReturnError(ctx.Writer, errs.IncorrectLoginOrPassword)
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(r.Password))
 	if err != nil {
-		errs.ReturnError(ctx.Writer, errs.IncorrectLoginOrPassword)
-		return nil
+		return errs.ReturnError(ctx.Writer, errs.IncorrectLoginOrPassword)
 	}
 
 	accessToken, err := s.tokenManager.GenerateAccessToken(model.NewUser(user))

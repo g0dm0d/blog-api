@@ -12,7 +12,7 @@ type Service struct {
 	Article article.Article
 }
 
-type ServiceOpts struct {
+type Opts struct {
 	UserStore    store.UserStore
 	SessionStore store.SessionStore
 	ArticleStore store.ArticleStore
@@ -20,7 +20,7 @@ type ServiceOpts struct {
 	AssetsDir    string
 }
 
-func New(s ServiceOpts) *Service {
+func New(s Opts) *Service {
 	return &Service{
 		User:    user.New(s.UserStore, s.SessionStore, s.Token),
 		Article: article.New(s.UserStore, s.ArticleStore, s.Token, s.AssetsDir),

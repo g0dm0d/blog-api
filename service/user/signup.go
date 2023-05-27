@@ -21,8 +21,7 @@ func (s *Service) Signup(ctx *req.Ctx) error {
 
 	err := ctx.ParseJSON(&r)
 	if err != nil {
-		errs.ReturnError(ctx.Writer, errs.InvalidJSON)
-		return nil
+		return errs.ReturnError(ctx.Writer, errs.InvalidJSON)
 	}
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(r.Password), bcrypt.DefaultCost)
@@ -33,14 +32,12 @@ func (s *Service) Signup(ctx *req.Ctx) error {
 		Email:    r.Email,
 	})
 	if err != nil {
-		errs.ReturnError(ctx.Writer, errs.UserAlreadyExists)
-		return nil
+		return errs.ReturnError(ctx.Writer, errs.UserAlreadyExists)
 	}
 
 	user, err := s.userStore.GetUserByLogin(store.GetUserOpts{Login: r.Username})
 	if err != nil {
-		errs.ReturnError(ctx.Writer, errs.InternalServerError)
-		return err
+		return errs.ReturnError(ctx.Writer, errs.InternalServerError)
 	}
 
 	return ctx.JSON(dto.NewUser(model.NewUser(user)))

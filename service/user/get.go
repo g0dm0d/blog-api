@@ -14,8 +14,7 @@ func (s *Service) GetByUsername(ctx *req.Ctx) error {
 	user, err := s.userStore.GetUserByUsername(store.GetUserOpts{Username: username})
 
 	if err != nil {
-		errs.ReturnError(ctx.Writer, errs.UserNotFound)
-		return err
+		return errs.ReturnError(ctx.Writer, errs.UserNotFound)
 	}
 
 	return ctx.JSON(dto.NewUserPublic(model.NewUser(user)))

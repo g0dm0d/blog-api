@@ -3,6 +3,7 @@ DROP PROCEDURE IF EXISTS create_article;
 DROP FUNCTION IF EXISTS search_article_by_tags;
 DROP FUNCTION IF EXISTS get_article_by_id;
 DROP FUNCTION IF EXISTS get_article_feed;
+DROP FUNCTION IF EXISTS search_article;
 
 DROP TABLE IF EXISTS sessions;
 DROP PROCEDURE IF EXISTS create_session;

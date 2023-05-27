@@ -20,7 +20,7 @@ func (c *Ctx) ParseJSON(v interface{}) error {
 	return json.NewDecoder(c.Request.Body).Decode(v)
 }
 
-// Return client json
+// JSON Return client json
 func (c *Ctx) JSON(v interface{}) error {
 	c.Writer.Header().Set("Content-Type", "application/json")
 

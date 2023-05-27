@@ -33,7 +33,6 @@ func (s *UserStore) GetUserByLogin(opts store.GetUserOpts) (store.User, error) {
 	return user, nil
 }
 
-// GetUserByLogin Login is email or username
 func (s *UserStore) GetUserByUsername(opts store.GetUserOpts) (store.User, error) {
 	var user store.User
 	req := s.db.QueryRow("SELECT * FROM get_user_by_username($1)", opts.Username)

@@ -267,31 +267,6 @@ BEGIN
 END;
 $$;
 
--- Create get user last article
-CREATE OR REPLACE FUNCTION get_user_article(
-    IN v_last    INT,
-    IN v_user_id INT
-)
-RETURNS TABLE (
-    p_id            INT,
-    p_title         VARCHAR,
-    p_path          VARCHAR,
-    p_markdown      TEXT,
-    p_tags          TEXT[],
-    p_preview       VARCHAR,
-    p_author        INT,
-    p_created_at    TIMESTAMP
-) LANGUAGE plpgsql AS $$
-BEGIN
-    RETURN QUERY
-    SELECT id, title, path, markdown, tags, preview, author_id, created_at
-    FROM articles
-    WHERE id <= (SELECT (abs(v_last - id)) FROM articles ORDER BY 1 DESC LIMIT 1)
-        AND author_id = v_user_id
-    ORDER BY id desc limit 15;
-END;
-$$;
-
 CREATE OR REPLACE FUNCTION search_article (
 	p_last    INT,
     p_tags    TEXT[]    = NULL,

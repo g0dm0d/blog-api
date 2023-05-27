@@ -6,26 +6,26 @@ import (
 )
 
 type Article struct {
-	ID         int        `json:"id"`
-	Title      string     `json:"title"`
-	Path       string     `json:"path"`
-	Markdown   string     `json:"markdown"`
-	Tags       []string   `json:"tags"`
-	Preview    string     `json:"preview"`
-	Created_at time.Time  `json:"created_at"`
-	Author     UserPublic `json:"author"`
+	ID        int        `json:"id"`
+	Title     string     `json:"title"`
+	Path      string     `json:"path"`
+	Markdown  string     `json:"markdown"`
+	Tags      []string   `json:"tags"`
+	Preview   string     `json:"preview"`
+	CreatedAt time.Time  `json:"created_at"`
+	Author    UserPublic `json:"author"`
 }
 
 func NewArticle(a model.Article, u UserPublic) Article {
 	return Article{
-		ID:         a.ID,
-		Title:      a.Title,
-		Path:       a.Path,
-		Markdown:   a.Markdown,
-		Tags:       a.Tags,
-		Preview:    a.Preview,
-		Created_at: a.Created_at,
-		Author:     u,
+		ID:        a.ID,
+		Title:     a.Title,
+		Path:      a.Path,
+		Markdown:  a.Markdown,
+		Tags:      a.Tags,
+		Preview:   a.Preview,
+		CreatedAt: a.CreatedAt,
+		Author:    u,
 	}
 }
 

@@ -31,7 +31,7 @@ func (s *SessionStore) GetArticle(opts store.GetArticleOpts) (store.Article, err
 
 	res := s.db.QueryRow("SELECT * FROM get_article_by_path($1)", opts.Path)
 
-	err := res.Scan(&article.ID, &article.Title, &article.Path, &article.Markdown, pq.Array(&article.Tags), &article.Preview, &article.Author_id, &article.Created_at)
+	err := res.Scan(&article.ID, &article.Title, &article.Path, &article.Markdown, pq.Array(&article.Tags), &article.Preview, &article.AuthorID, &article.CreatedAt)
 	if err != nil {
 		return store.Article{}, err
 	}
@@ -49,7 +49,7 @@ func (s *SessionStore) GetArticleForFeed(opts store.GetArticleFeed) ([]store.Art
 
 	for res.Next() {
 		var article store.Article
-		err = res.Scan(&article.ID, &article.Title, &article.Path, &article.Markdown, pq.Array(&article.Tags), &article.Preview, &article.Author_id, &article.Created_at)
+		err = res.Scan(&article.ID, &article.Title, &article.Path, &article.Markdown, pq.Array(&article.Tags), &article.Preview, &article.AuthorID, &article.CreatedAt)
 		if err != nil {
 			return []store.Article{}, err
 		}
@@ -77,7 +77,7 @@ func (s *SessionStore) SearchArticle(opts store.SearchArticleOpts) ([]store.Arti
 
 	for res.Next() {
 		var article store.Article
-		err = res.Scan(&article.ID, &article.Title, &article.Path, &article.Markdown, pq.Array(&article.Tags), &article.Preview, &article.Author_id, &article.Created_at)
+		err = res.Scan(&article.ID, &article.Title, &article.Path, &article.Markdown, pq.Array(&article.Tags), &article.Preview, &article.AuthorID, &article.CreatedAt)
 		if err != nil {
 			return []store.Article{}, err
 		}

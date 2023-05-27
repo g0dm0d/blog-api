@@ -6,26 +6,26 @@ import (
 )
 
 type Article struct {
-	ID         int
-	Title      string
-	Path       string
-	Markdown   string
-	Tags       []string
-	Preview    string
-	Author_id  int
-	Created_at time.Time
+	ID        int
+	Title     string
+	Path      string
+	Markdown  string
+	Tags      []string
+	Preview   string
+	AuthorID  int
+	CreatedAt time.Time
 }
 
 func NewArticle(a store.Article) Article {
 	return Article{
-		ID:         a.ID,
-		Title:      a.Title,
-		Path:       a.Path,
-		Markdown:   a.Markdown,
-		Tags:       a.Tags,
-		Preview:    a.Preview.String,
-		Author_id:  a.Author_id,
-		Created_at: a.Created_at,
+		ID:        a.ID,
+		Title:     a.Title,
+		Path:      a.Path,
+		Markdown:  a.Markdown,
+		Tags:      a.Tags,
+		Preview:   a.Preview.String,
+		AuthorID:  a.AuthorID,
+		CreatedAt: a.CreatedAt,
 	}
 }
 

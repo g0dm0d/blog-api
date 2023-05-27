@@ -2,6 +2,7 @@ package user
 
 import (
 	"blog-api/model"
+	"blog-api/pkg/errs"
 	"blog-api/rest/req"
 	"blog-api/store"
 )
@@ -18,7 +19,10 @@ type RefreshResponse struct {
 func (s *Service) Refresh(ctx *req.Ctx) error {
 	var r RefreshRequest
 
-	ctx.ParseJSON(&r)
+	err := ctx.ParseJSON(&r)
+	if err != nil {
+		return errs.ReturnError(ctx.Writer, errs.InvalidJSON)
+	}
 
 	refreshToken, err := s.tokenManager.GenerateRefreshToken()
 	if err != nil {

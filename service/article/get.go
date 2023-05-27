@@ -21,7 +21,7 @@ func (s *Service) GetArticle(ctx *req.Ctx) error {
 		return err
 	}
 
-	user, err := s.userStore.GetUserByID(store.GetUserOpts{ID: article.Author_id})
+	user, err := s.userStore.GetUserByID(store.GetUserOpts{ID: article.AuthorID})
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func (s *Service) GetArticleForFeed(ctx *req.Ctx) error {
 
 	var users []store.User
 	for _, article := range articles {
-		user, err := s.userStore.GetUserByID(store.GetUserOpts{ID: article.Author_id})
+		user, err := s.userStore.GetUserByID(store.GetUserOpts{ID: article.AuthorID})
 		if err != nil {
 			return err
 		}
@@ -88,7 +88,7 @@ func (s *Service) SearchArticle(ctx *req.Ctx) error {
 
 	var users []store.User
 	for _, article := range articles {
-		user, err := s.userStore.GetUserByID(store.GetUserOpts{ID: article.Author_id})
+		user, err := s.userStore.GetUserByID(store.GetUserOpts{ID: article.AuthorID})
 		if err != nil {
 			return err
 		}

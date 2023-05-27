@@ -5,9 +5,9 @@ import (
 	"net/http"
 )
 
-func ReturnError(w http.ResponseWriter, code Code) {
+func ReturnError(w http.ResponseWriter, code Code) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(HTTPStatusCode(code.Code))
 
-	json.NewEncoder(w).Encode(code)
+	return json.NewEncoder(w).Encode(code)
 }

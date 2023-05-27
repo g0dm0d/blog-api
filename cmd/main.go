@@ -51,7 +51,7 @@ func main() {
 	tokenManager := tokenmanager.New(cfg.Server.Secret)
 
 	// Services
-	services := service.New(service.ServiceOpts{
+	services := service.New(service.Opts{
 		UserStore:    userStore,
 		SessionStore: sessionStore,
 		ArticleStore: articleStore,

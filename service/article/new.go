@@ -24,8 +24,7 @@ func (s *Service) NewArticle(ctx *req.Ctx) error {
 
 	err := ctx.ParseJSON(&r)
 	if err != nil {
-		errs.ReturnError(ctx.Writer, errs.InvalidJSON)
-		return nil
+		return errs.ReturnError(ctx.Writer, errs.InvalidJSON)
 	}
 
 	claims, err := s.tokenManager.ValidateJWTToken(ctx.BearerToken())

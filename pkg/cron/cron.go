@@ -11,7 +11,7 @@ type Task struct {
 	Action   func() error
 }
 
-// These are the parameters of the time when the task starts.
+// Schedule These are the parameters of the time when the task starts.
 //
 // The IsDate parameter is a parameter which means that the task is executed relative to 00:00 real time. e.g.
 //
