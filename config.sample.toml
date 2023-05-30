@@ -2,6 +2,7 @@
 Addr = "localhost"
 Port = "3333"
 Secret = "megaSecret"
+AssetsDir ="./assets"
 
 [Database]
 DSN="postgres://postgres:12345@localhost:5432/postgres?sslmode=disable"
