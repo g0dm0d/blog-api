@@ -50,7 +50,7 @@ func NewUserPublic(u model.User) UserPublic {
 }
 
 func NewUsersPublic(u []model.User) []UserPublic {
-	var usersPublic []UserPublic
+	usersPublic := []UserPublic{}
 	for i := range u {
 		usersPublic = append(usersPublic, NewUserPublic(u[i]))
 	}

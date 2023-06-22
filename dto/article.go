@@ -30,7 +30,7 @@ func NewArticle(a model.Article, u UserPublic) Article {
 }
 
 func NewArticles(a []model.Article, u []UserPublic) []Article {
-	var articles []Article
+	articles := []Article{}
 	for i := range a {
 		articles = append(articles, NewArticle(a[i], u[i]))
 	}
