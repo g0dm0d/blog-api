@@ -10,4 +10,5 @@ RUN go build -o nttt_blog ./cmd/main.go
 FROM alpine:3.18.2
 COPY --from=builder /build/nttt_blog nttt_blog
 COPY --from=builder /build/config.toml config.toml
+RUN mkdir assets
 CMD ["./nttt_blog"]
